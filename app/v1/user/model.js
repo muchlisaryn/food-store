@@ -1,5 +1,7 @@
 const mongoose = require("mongoose");
+const bcrypt = require("bcrypt");
 const { model, Schema } = mongoose;
+const AutoIncrement = require("mongoose-sequence")(mongoose);
 
 const userSchema = Schema(
   {
@@ -22,12 +24,12 @@ const userSchema = Schema(
       required: [true, "Password harus diisi"],
       maxLength: [255, "Panjang password maksimal 255 karakter"],
     },
-    password: {
+    role: {
       type: String,
       enum: ["user", "admin"],
       default: "user",
     },
-    token: String,
+    token: [String],
   },
   { timestamps: true }
 );
@@ -51,4 +53,16 @@ userSchema.path(`email`).validate(
   },
   (attr) => `email ${attr.value} sudah terdaftar !`
 );
+
+userSchema.pre("save", function (next) {
+  const HASH_ROUND = 10;
+  this.password = bcrypt.hashSync(this.password, HASH_ROUND);
+  next();
+});
+
+userSchema.plugin(AutoIncrement, {
+  inc_field: "customer_id",
+  disable_hooks: true,
+});
+
 module.exports = model("user", userSchema);

@@ -9,6 +9,8 @@ const app = express();
 const productRoute = require("./app/v1/product/router");
 const categoryRoute = require("./app/v1/category/router");
 const tagRoute = require("./app/v1/tag/router");
+const authUserRoute = require("./app/v1/auth/router");
+const userRoute = require("./app/v1/user/router");
 
 const v1 = "/api/v1";
 
@@ -27,6 +29,8 @@ app.use(express.static(path.join(__dirname, "public")));
 app.use(v1, productRoute);
 app.use(v1, categoryRoute);
 app.use(v1, tagRoute);
+app.use("/auth/v1", authUserRoute);
+app.use(v1, userRoute);
 
 // catch 404 and forward to error handler
 app.use(function (req, res, next) {
