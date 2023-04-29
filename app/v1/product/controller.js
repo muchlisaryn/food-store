@@ -119,22 +119,17 @@ const updateProduct = async (req, res, next) => {
     const findProduct = await Product.findById({ _id: id });
 
     const discountPrice = () => {
-      let disc;
-
       if (price) {
-        disc = price - (price * discount) / 100;
+        return price - (price * discount) / 100;
       } else {
-        disc = findProduct?.price - (findProduct?.price * discount) / 100;
+        return findProduct?.price - (findProduct?.price * discount) / 100;
       }
-
-      return disc;
     };
 
     const isPrice = () => {
       if (price) {
         return price;
       }
-
       return findProduct?.price;
     };
 
@@ -233,6 +228,22 @@ const updateProduct = async (req, res, next) => {
   }
 };
 
+const getOneProduct = async (req, res, next) => {
+  try {
+    const { id } = req.params;
+    const findProduct = await Product.findOne({ _id: id });
+
+    if (!findProduct) {
+      return res.status(400).json({
+        message: `Product id ${id} tidak ditemukan`,
+      });
+    }
+    res.status(200).json(findProduct);
+  } catch (error) {
+    next(error);
+  }
+};
+
 const getProduct = async (req, res, next) => {
   try {
     const {
@@ -311,4 +322,10 @@ const deleteProduct = async (req, res, next) => {
   }
 };
 
-module.exports = { createProduct, getProduct, deleteProduct, updateProduct };
+module.exports = {
+  createProduct,
+  getProduct,
+  getOneProduct,
+  deleteProduct,
+  updateProduct,
+};

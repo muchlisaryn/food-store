@@ -1,4 +1,5 @@
 const router = require("express").Router();
+const { policies_check } = require("../../../middlewares");
 
 const {
   createCategory,
@@ -8,8 +9,16 @@ const {
 } = require("./controller");
 
 router.get("/category", getCategory);
-router.post("/category", createCategory);
-router.put("/category/:id", updateCategory);
-router.delete("/category/:id", deleteCategory);
+router.post("/category", policies_check("create", "Category"), createCategory);
+router.put(
+  "/category/:id",
+  policies_check("update", "Category"),
+  updateCategory
+);
+router.delete(
+  "/category/:id",
+  policies_check("delete", "Category"),
+  deleteCategory
+);
 
 module.exports = router;
