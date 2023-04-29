@@ -4,6 +4,7 @@ const cookieParser = require("cookie-parser");
 const logger = require("morgan");
 const cors = require("cors");
 const app = express();
+const { decodeToken } = require("./middlewares");
 
 //router
 const productRoute = require("./app/v1/product/router");
@@ -25,6 +26,7 @@ app.use(express.json());
 app.use(express.urlencoded({ extended: false }));
 app.use(cookieParser());
 app.use(express.static(path.join(__dirname, "public")));
+app.use(decodeToken());
 
 app.use(v1, productRoute);
 app.use(v1, categoryRoute);

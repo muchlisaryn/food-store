@@ -7,9 +7,17 @@ const Tag = require("../tag/model");
 
 const createProduct = async (req, res, next) => {
   try {
-    const { name, description, price, category, tags } = req.body;
+    const { name, description, price, discount, category, tags } = req.body;
     const categoryName = category?.toLowerCase();
     const findCategory = await Category.findOne({ tag: categoryName });
+
+    if (discount > 100) {
+      return res.status(400).json({
+        message: `Discount max 100%`,
+      });
+    }
+
+    const discountPrice = (price * discount) / 100;
 
     if (!findCategory) {
       return res.status(400).json({
@@ -43,6 +51,8 @@ const createProduct = async (req, res, next) => {
             image_url,
             category: findCategory?._id,
             tags: tag?.map((tag) => tag._id),
+            discount,
+            current_price: discount ? price - discountPrice : price,
             image_url: filename,
           });
           await product.save();
@@ -64,6 +74,8 @@ const createProduct = async (req, res, next) => {
         name,
         description,
         price,
+        discount,
+        current_price: discount ? price - discountPrice : price,
         category: findCategory?._id,
         tags: tag?.map((tag) => tag?._id),
       });
@@ -71,7 +83,7 @@ const createProduct = async (req, res, next) => {
       return res.status(202).json(product);
     }
   } catch (error) {
-    if (error && error.name === "ValidationError") {
+    if (error && error.name === "ValidatorError") {
       return res.json({
         error: 1,
         message: error.message,
@@ -84,21 +96,51 @@ const createProduct = async (req, res, next) => {
 
 const updateProduct = async (req, res, next) => {
   try {
-    const { name, description, price, category } = req.body;
+    const { name, description, price, category, discount } = req.body;
+    const { id } = req.params;
     const categoryName = category?.toLowerCase();
 
-    const findCategory = await Category.findOne({ tag: categoryName });
-
-    if (!findCategory) {
+    if (discount > 100) {
       return res.status(400).json({
-        message: `category ${category} tidak ditemukan`,
+        message: `Discount max 100%`,
       });
     }
-    const { id } = req.params;
 
-    const checkId = await Product.findById({ _id: id });
+    if (category && category.length) {
+      const findCategory = await Category.findOne({ tag: categoryName });
 
-    if (!checkId) {
+      if (!findCategory) {
+        return res.status(400).json({
+          message: `category ${category} tidak ditemukan`,
+        });
+      }
+    }
+
+    const findProduct = await Product.findById({ _id: id });
+
+    const discountPrice = () => {
+      let disc;
+
+      if (price) {
+        disc = price - (price * discount) / 100;
+      } else {
+        disc = findProduct?.price - (findProduct?.price * discount) / 100;
+      }
+
+      return disc;
+    };
+
+    const isPrice = () => {
+      if (price) {
+        return price;
+      }
+
+      return findProduct?.price;
+    };
+
+    const findCategory = Category.findOne({ tag: categoryName });
+
+    if (!findProduct) {
       return res.status(400).json({
         message: `id product ${id} tidak ditemukan`,
       });
@@ -136,6 +178,8 @@ const updateProduct = async (req, res, next) => {
               name,
               description,
               price,
+              current_price: discount > 0 ? discountPrice() : isPrice(),
+              discount,
               category: findCategory?._id,
               image_url: filename,
             },
@@ -161,7 +205,14 @@ const updateProduct = async (req, res, next) => {
     } else {
       let product = await Product.findByIdAndUpdate(
         { _id: id },
-        { name, description, price, category: findCategory?._id },
+        {
+          name,
+          description,
+          price,
+          discount,
+          current_price: discount > 0 ? discountPrice() : isPrice(),
+          category: findCategory?._id,
+        },
         {
           new: true,
           runValidators: true,
@@ -177,6 +228,7 @@ const updateProduct = async (req, res, next) => {
         fields: error.message,
       });
     }
+
     next(error);
   }
 };
@@ -185,7 +237,7 @@ const getProduct = async (req, res, next) => {
   try {
     const {
       skip = 0,
-      limit = 10,
+      limit = null,
       q = "",
       category = "",
       tags = [],

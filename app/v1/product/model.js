@@ -14,7 +14,21 @@ const productSchema = Schema(
     },
     price: {
       type: Number,
+      min: 0,
       default: 0,
+    },
+    current_price: {
+      type: Number,
+      min: 0,
+      default: 0,
+    },
+    discount: {
+      type: Number,
+      min: 0,
+      max: [100, "Discount max 100%"],
+    },
+    sold: {
+      type: Number,
     },
     image_url: {
       type: String,
