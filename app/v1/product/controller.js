@@ -119,18 +119,17 @@ const updateProduct = async (req, res, next) => {
     const findProduct = await Product.findById({ _id: id });
 
     const discountPrice = () => {
-      if (price) {
-        return price - (price * discount) / 100;
-      } else {
+      if (discount > 0) {
+        if (price) {
+          return price - (price * discount) / 100;
+        }
         return findProduct?.price - (findProduct?.price * discount) / 100;
+      } else {
+        if (price) {
+          return price;
+        }
+        return findProduct?.price;
       }
-    };
-
-    const isPrice = () => {
-      if (price) {
-        return price;
-      }
-      return findProduct?.price;
     };
 
     const findCategory = Category.findOne({ tag: categoryName });
@@ -173,7 +172,7 @@ const updateProduct = async (req, res, next) => {
               name,
               description,
               price,
-              current_price: discount > 0 ? discountPrice() : isPrice(),
+              current_price: discountPrice(),
               discount,
               category: findCategory?._id,
               image_url: filename,
@@ -204,8 +203,8 @@ const updateProduct = async (req, res, next) => {
           name,
           description,
           price,
+          current_price: discountPrice(),
           discount,
-          current_price: discount > 0 ? discountPrice() : isPrice(),
           category: findCategory?._id,
         },
         {
@@ -281,12 +280,12 @@ const getProduct = async (req, res, next) => {
       }
     }
 
-    const count = await Product.find().countDocuments();
+    const count = await Product.find(ceriteria).countDocuments();
 
-    let product = await Product.find()
+    let product = await Product.find(ceriteria)
       .populate("category")
       .populate("tags")
-      .skip(parseInt(skip))
+      .skip(parseInt((skip - 1) * limit))
       .limit(parseInt(limit));
     res.json({
       data: product,

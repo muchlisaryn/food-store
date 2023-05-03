@@ -106,8 +106,21 @@ const deleteCategory = async (req, res, next) => {
 
 const getCategory = async (req, res, next) => {
   try {
-    let category = await Category.find();
-    return res.json(category);
+    const { skip = null, limit = null, q = "" } = req.query;
+    let ceriteria = {};
+
+    if (q.length > 0) {
+      ceriteria = { ...ceriteria, name: { $regex: `${q}`, $options: "i" } };
+    }
+
+    const count = await Category.find(ceriteria).countDocuments();
+    let result = await Category.find(ceriteria)
+      .skip(parseInt((skip - 1) * limit))
+      .limit(parseInt(limit));
+    return res.json({
+      data: result,
+      count,
+    });
   } catch (error) {
     if (error && error.name === "ValidationError") {
       return res.json({
