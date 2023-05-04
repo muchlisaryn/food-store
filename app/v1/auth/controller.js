@@ -8,8 +8,10 @@ const getToken = require("../../../utils");
 const register = async (req, res, next) => {
   try {
     const payload = req.body;
+    const full_name = payload?.first_name + " " + payload?.last_name;
+    console.log(full_name);
 
-    let result = await User.create(payload);
+    let result = await User.create({ ...payload, full_name });
     console.log(result);
     return res.status(202).json(result);
   } catch (error) {

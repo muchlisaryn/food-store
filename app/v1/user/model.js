@@ -5,11 +5,21 @@ const AutoIncrement = require("mongoose-sequence")(mongoose);
 
 const userSchema = Schema(
   {
+    first_name: {
+      type: String,
+      minLength: [3, "Panjang first name harus 3 - 30 karakter"],
+      maxLength: [30, "Panjang first name 3 - 30 karakter"],
+      required: [true, "First Name Harus diisi"],
+    },
+    last_name: {
+      type: String,
+      minLength: [3, "Panjang last name harus 3 - 30 karakter"],
+      maxLength: [30, "Panjang last name harus 3 - 30 karakter"],
+      required: [true, "Last Name Harus diisi"],
+    },
     full_name: {
       type: String,
-      minLength: [3, "Panjang nama harus 3 - 255 karakter"],
-      maxLength: [255, "Panjang nama harus 3 - 255 karakter"],
-      required: [true, "Nama Panjang Harus diisi"],
+      required: [true, "Last Name Harus diisi"],
     },
     customer_id: {
       type: Number,

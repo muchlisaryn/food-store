@@ -96,7 +96,7 @@ const createProduct = async (req, res, next) => {
 
 const updateProduct = async (req, res, next) => {
   try {
-    const { name, description, price, category, discount } = req.body;
+    const { name, description, price, category, discount, status } = req.body;
     const { id } = req.params;
     const categoryName = category?.toLowerCase();
 
@@ -174,6 +174,7 @@ const updateProduct = async (req, res, next) => {
               price,
               current_price: discountPrice(),
               discount,
+              status,
               category: findCategory?._id,
               image_url: filename,
             },
@@ -205,6 +206,7 @@ const updateProduct = async (req, res, next) => {
           price,
           current_price: discountPrice(),
           discount,
+          status,
           category: findCategory?._id,
         },
         {
@@ -248,12 +250,17 @@ const getProduct = async (req, res, next) => {
     const {
       skip = 0,
       limit = null,
+      status = "",
       q = "",
       category = "",
       tags = [],
     } = req.query;
 
     let ceriteria = {};
+
+    if (status === "active" || status === "not active") {
+      ceriteria = { ...ceriteria, status: status };
+    }
 
     if (q.length > 0) {
       ceriteria = { ...ceriteria, name: { $regex: `${q}`, $options: "i" } };
@@ -279,6 +286,8 @@ const getProduct = async (req, res, next) => {
         };
       }
     }
+
+    console.log(ceriteria);
 
     const count = await Product.find(ceriteria).countDocuments();
 
