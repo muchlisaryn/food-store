@@ -8,6 +8,11 @@ const deliveryAddressSchema = Schema(
       required: true,
       maxLength: [255, "Panjang maksimal nama alamat adalah 255 karakter"],
     },
+    no_telephone: {
+      type: Number,
+      required: true,
+      maxLength: [10, "Panjang maksimal nomor telephone adalah 10 digit"],
+    },
     kelurahan: {
       type: String,
       required: true,

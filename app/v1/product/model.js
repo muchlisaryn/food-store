@@ -6,11 +6,12 @@ const productSchema = Schema(
     name: {
       type: String,
       minLength: [3, "Panjang nama makanan minimal 3 karakter"],
+      maxLength: [50, "Panjang name maksimal 50 karakter"],
       required: true,
     },
     description: {
       type: String,
-      maxLength: [100, "Panjang deskripsi maksimal 1000 karakter"],
+      maxLength: [100, "Panjang deskripsi maksimal 100 karakter"],
     },
     price: {
       type: Number,

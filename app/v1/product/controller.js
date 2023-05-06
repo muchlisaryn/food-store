@@ -48,12 +48,11 @@ const createProduct = async (req, res, next) => {
             name,
             description,
             price,
-            image_url,
             category: findCategory?._id,
             tags: tag?.map((tag) => tag._id),
             discount,
             current_price: discount ? price - discountPrice : price,
-            image_url: filename,
+            image_url: `http://localhost:${process.env.PORT}/images/products/${filename}`,
           });
           await product.save();
           return res.status(202).json(product);
@@ -78,6 +77,7 @@ const createProduct = async (req, res, next) => {
         current_price: discount ? price - discountPrice : price,
         category: findCategory?._id,
         tags: tag?.map((tag) => tag?._id),
+        image_url: `http://localhost:${process.env.PORT}/images/products/default.jpg`,
       });
       product.save();
       return res.status(202).json(product);
@@ -176,7 +176,7 @@ const updateProduct = async (req, res, next) => {
               discount,
               status,
               category: findCategory?._id,
-              image_url: filename,
+              image_url: `http://localhost:${process.env.PORT}/images/products/${filename}`,
             },
             {
               new: true,
