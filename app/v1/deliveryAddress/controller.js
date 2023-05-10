@@ -1,4 +1,6 @@
+const { subject } = require("@casl/ability");
 const DeliveryAddress = require("./model");
+const { policyFor } = require("../../../utils");
 
 const createDeliveryAddress = async (req, res, next) => {
   try {
@@ -26,14 +28,26 @@ const createDeliveryAddress = async (req, res, next) => {
 
 const updateDeliveryAddress = async (req, res, next) => {
   try {
+    const { _id, ...payload } = req.body;
     const { id } = req.params;
-    const payload = req.body;
 
     const findData = await DeliveryAddress.findOne({ _id: id });
 
     if (!findData) {
       return res.status(400).json({
         message: `Delivery Address dengan id ${id} tidak ditemukan`,
+      });
+    }
+
+    const subjectAddress = subject("DeliveryAddress", {
+      ...findData,
+      user_id: findData.user,
+    });
+    const policy = policyFor(req.user);
+    if (!policy.can("update", subjectAddress)) {
+      return res.status(400).json({
+        error: 1,
+        message: "Youre not allowed to modify this resource",
       });
     }
 
@@ -56,10 +70,31 @@ const updateDeliveryAddress = async (req, res, next) => {
   }
 };
 
-const getDelivery = async (req, res, next) => {
+const destroy = async (req, res, next) => {
   try {
-    const result = await DeliveryAddress.find();
+    const { id } = req.params;
+    const findData = await DeliveryAddress.findOne({ _id: id });
 
+    if (!findData) {
+      return res.status(400).json({
+        message: `Delivery Address dengan id ${id} tidak ditemukan`,
+      });
+    }
+
+    const subjectAddress = subject("DeliveryAddress", {
+      ...findData,
+      user_id: findData?.user,
+    });
+    const policy = policyFor(req.user);
+
+    if (!policy.can("delete", subjectAddress)) {
+      return res.status(400).json({
+        error: 1,
+        message: "Youre not allowed to modify this resource",
+      });
+    }
+
+    const result = await DeliveryAddress.findByIdAndDelete({ _id: id });
     return res.json(result);
   } catch (error) {
     if (error && error.name === "ValidationError") {
@@ -74,20 +109,19 @@ const getDelivery = async (req, res, next) => {
   }
 };
 
-const destroy = async (req, res, next) => {
+const getDelivery = async (req, res, next) => {
   try {
-    const { id } = req.params;
+    const { skip = 0, limit = 10 } = req.query;
+    const count = await DeliveryAddress.find({
+      user: req.user?._id,
+    }).countDocuments();
 
-    const findData = await DeliveryAddress.findOne({ _id: id });
+    const result = await DeliveryAddress.find({ user: req.user._id })
+      .skip(parseInt(skip))
+      .limit(parseInt(limit))
+      .sort("-createdAt");
 
-    if (!findData) {
-      return res.status(400).json({
-        message: `Delivery Address dengan id ${id} tidak ditemukan`,
-      });
-    }
-
-    const result = await DeliveryAddress.findByIdAndDelete({ _id: id });
-    return res.json(result);
+    return res.json({ data: result, count });
   } catch (error) {
     if (error && error.name === "ValidationError") {
       return res.json({

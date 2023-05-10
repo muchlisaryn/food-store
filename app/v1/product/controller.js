@@ -232,7 +232,7 @@ const updateProduct = async (req, res, next) => {
 const getOneProduct = async (req, res, next) => {
   try {
     const { id } = req.params;
-    const findProduct = await Product.findOne({ _id: id });
+    const findProduct = await Product.findOne({ _id: id }).populate("category");
 
     if (!findProduct) {
       return res.status(400).json({

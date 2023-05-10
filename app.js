@@ -12,6 +12,10 @@ const categoryRoute = require("./app/v1/category/router");
 const tagRoute = require("./app/v1/tag/router");
 const authUserRoute = require("./app/v1/auth/router");
 const userRoute = require("./app/v1/user/router");
+const deliveryRoute = require("./app/v1/deliveryAddress/router");
+const cartRoute = require("./app/v1/cart/router");
+const orderRoute = require("./app/v1/order/router");
+const invoiceRoute = require("./app/v1/invoice/router");
 
 const v1 = "/api/v1";
 
@@ -34,6 +38,10 @@ app.use(v1, categoryRoute);
 app.use(v1, tagRoute);
 app.use("/auth/v1", authUserRoute);
 app.use(v1, userRoute);
+app.use(v1, deliveryRoute);
+app.use(v1, cartRoute);
+app.use(v1, orderRoute);
+app.use(v1, invoiceRoute);
 
 // catch 404 and forward to error handler
 app.use(function (req, res, next) {
