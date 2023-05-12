@@ -13,9 +13,7 @@ const userSchema = Schema(
     },
     last_name: {
       type: String,
-      minLength: [3, "Panjang last name harus 3 - 30 karakter"],
       maxLength: [30, "Panjang last name harus 3 - 30 karakter"],
-      required: [true, "Last Name Harus diisi"],
     },
     full_name: {
       type: String,

@@ -1,12 +1,13 @@
 const { Ability, AbilityBuilder } = require("@casl/ability");
 
-function getToken(req) {
+const getToken = (req, res, next) => {
+  console.log(req.headers.authorization);
   let token = req.headers.authorization
-    ? req.headers.authorization.split(" ")[1]
+    ? req.headers.authorization.replace("Bearer", " ")
     : null;
 
   return token?.length > 0 ? token : null;
-}
+};
 
 const policies = {
   guest(user, { can }) {

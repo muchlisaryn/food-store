@@ -3,13 +3,12 @@ const User = require("../user/model");
 const bcrypt = require("bcrypt");
 const jwt = require("jsonwebtoken");
 const config = require("../../config");
-const getToken = require("../../../utils");
+const { getToken } = require("../../../utils");
 
 const register = async (req, res, next) => {
   try {
     const payload = req.body;
     const full_name = payload?.first_name + " " + payload?.last_name;
-    console.log(full_name);
 
     let result = await User.create({ ...payload, full_name });
     console.log(result);
@@ -71,24 +70,25 @@ const login = (req, res, next) => {
 };
 
 const logout = async (req, res, next) => {
-  const token = getToken(req);
-
-  const user = await User.findOneAndUpdate(
-    { token: { $in: [token] } },
-    { $pull: { token } },
-    { useFindAndModify: false }
-  );
-
-  if (!token || !user) {
-    res.status(400).json({
-      error: 1,
-      message: "User Not Found!!",
+  try {
+    const token = await getToken(req);
+    const user = await User.findOneAndUpdate(
+      { token: { $in: [token] } },
+      { $pull: { token } },
+      { useFindAndModify: false }
+    );
+    if (!token || !user) {
+      return res.status(400).json({
+        error: 1,
+        message: "User Not Found!!",
+      });
+    }
+    return res.status(200).json({
+      message: "Logout Berhasil",
     });
+  } catch (err) {
+    next(err);
   }
-
-  return res.json({
-    message: "Logout Berhasil",
-  });
 };
 
 const checkUserToken = (req, res, next) => {

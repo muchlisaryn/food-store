@@ -11,6 +11,8 @@ const createProduct = async (req, res, next) => {
     const categoryName = category?.toLowerCase();
     const findCategory = await Category.findOne({ tag: categoryName });
 
+    console.log(tags);
+
     if (discount > 100) {
       return res.status(400).json({
         message: `Discount max 100%`,
@@ -25,7 +27,11 @@ const createProduct = async (req, res, next) => {
       });
     }
 
-    const tag = await Tag.find({ tag: { $in: tags } });
+    const tag = await Tag.find({
+      name: { $in: tags },
+    });
+
+    console.log(tag);
 
     if (req.file) {
       let temp_path = req.file.path;
@@ -232,7 +238,9 @@ const updateProduct = async (req, res, next) => {
 const getOneProduct = async (req, res, next) => {
   try {
     const { id } = req.params;
-    const findProduct = await Product.findOne({ _id: id }).populate("category");
+    const findProduct = await Product.findOne({ _id: id })
+      .populate("category")
+      .populate("tags");
 
     if (!findProduct) {
       return res.status(400).json({
@@ -258,7 +266,7 @@ const getProduct = async (req, res, next) => {
 
     let ceriteria = {};
 
-    if (status === "active" || status === "not active") {
+    if (status === true || status === false) {
       ceriteria = { ...ceriteria, status: status };
     }
 
@@ -276,8 +284,8 @@ const getProduct = async (req, res, next) => {
     }
 
     if (tags.length > 0) {
-      const tagName = tags?.toLowerCase();
-      const resultTag = await Tag.find({ tag: tagName });
+      const arrTags = tags.split(",");
+      const resultTag = await Tag.find({ name: arrTags });
 
       if (resultTag) {
         ceriteria = {
@@ -286,8 +294,6 @@ const getProduct = async (req, res, next) => {
         };
       }
     }
-
-    console.log(ceriteria);
 
     const count = await Product.find(ceriteria).countDocuments();
 
