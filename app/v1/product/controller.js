@@ -256,9 +256,9 @@ const getOneProduct = async (req, res, next) => {
 const getProduct = async (req, res, next) => {
   try {
     const {
-      skip = 0,
+      skip = 1,
       limit = null,
-      status = "",
+      status = undefined,
       q = "",
       category = "",
       tags = [],
@@ -266,7 +266,9 @@ const getProduct = async (req, res, next) => {
 
     let ceriteria = {};
 
-    if (status === true || status === false) {
+    console.log(limit);
+
+    if (status) {
       ceriteria = { ...ceriteria, status: status };
     }
 

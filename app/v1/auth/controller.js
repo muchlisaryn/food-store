@@ -11,14 +11,12 @@ const register = async (req, res, next) => {
     const full_name = payload?.first_name + " " + payload?.last_name;
 
     let result = await User.create({ ...payload, full_name });
-    console.log(result);
     return res.status(202).json(result);
   } catch (error) {
-    if (error && error.name === "ValidationError") {
-      return res.json({
+    if (error?.errors?.email) {
+      return res.status(400).json({
         error: 1,
-        message: error.message,
-        fields: error.message,
+        message: error?.errors?.email?.message,
       });
     }
     next(error);
@@ -32,7 +30,7 @@ const localStrategy = async (email, password, done) => {
     );
 
     if (!user) {
-      return done;
+      return done();
     }
 
     if (bcrypt.compareSync(password, user?.password)) {
@@ -40,9 +38,9 @@ const localStrategy = async (email, password, done) => {
       return done(null, userWithoutPassword);
     }
   } catch (error) {
-    done(error, null);
+    return done(error, null);
   }
-  done();
+  return done();
 };
 
 const login = (req, res, next) => {
@@ -80,7 +78,7 @@ const logout = async (req, res, next) => {
     if (!token || !user) {
       return res.status(400).json({
         error: 1,
-        message: "User Not Found!!",
+        message: "Logout Failed",
       });
     }
     return res.status(200).json({
