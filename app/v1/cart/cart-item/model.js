@@ -1,5 +1,4 @@
 const mongoose = require("mongoose");
-const { schema } = require("../../user/model");
 const { model, Schema } = mongoose;
 
 const cartItemSchema = Schema({
@@ -16,7 +15,7 @@ const cartItemSchema = Schema({
     type: Number,
     default: 0,
   },
-  image_url: String,
+
   product: {
     type: Schema.Types.ObjectId,
     ref: "Product",

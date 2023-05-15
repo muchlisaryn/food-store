@@ -1,6 +1,30 @@
 const Product = require("../product/model");
 const CartItem = require("./cart-item/model");
 
+const insert = async (req, res, next) => {
+  try {
+    const { items, qty, price } = req.body;
+
+    const result = await CartItem.create({
+      name: items?.name,
+      qty,
+      price,
+      product: items?._id,
+      user: req.user._id,
+    });
+    return res.status(202).json(result);
+  } catch (error) {
+    if (error && error.name == "ValidationError") {
+      return res.json({
+        error: 1,
+        message: error.message,
+        fields: error.message,
+      });
+    }
+    next(error);
+  }
+};
+
 const update = async (req, res, next) => {
   try {
     const { items } = req.body;
@@ -15,7 +39,6 @@ const update = async (req, res, next) => {
       return {
         product: relatedProduct._id,
         price: relatedProduct.price,
-        image_url: relatedProduct.image_url,
         name: relatedProduct.name,
         user: req.user._id,
         qty: item.qty,
@@ -37,8 +60,9 @@ const update = async (req, res, next) => {
         };
       })
     );
+    return res.json(cartItems);
   } catch (error) {
-    if (err && err.name == "ValidationError") {
+    if (error && error.name == "ValidationError") {
       return res.json({
         error: 1,
         message: error.message,
@@ -58,12 +82,12 @@ const getCart = async (req, res, next) => {
     if (err && err.name == "ValidationError") {
       return res.json({
         error: 1,
-        message: error.message,
-        fields: error.message,
+        message: err.message,
+        fields: err.message,
       });
     }
     next(err);
   }
 };
 
-module.exports = { update, getCart };
+module.exports = { update, getCart, insert };

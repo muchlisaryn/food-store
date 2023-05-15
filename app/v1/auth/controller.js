@@ -70,6 +70,7 @@ const login = (req, res, next) => {
 const logout = async (req, res, next) => {
   try {
     const token = await getToken(req);
+    console.log("ini token", token);
     const user = await User.findOneAndUpdate(
       { token: { $in: [token] } },
       { $pull: { token } },
