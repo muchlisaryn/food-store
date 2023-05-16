@@ -12,6 +12,7 @@ const insert = async (req, res, next) => {
       product: items?._id,
       user: req.user._id,
     });
+    console.log("ini result", items);
     return res.status(202).json(result);
   } catch (error) {
     if (error && error.name == "ValidationError") {

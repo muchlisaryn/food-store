@@ -34,6 +34,7 @@ const policies = {
 };
 
 const policyFor = (user) => {
+  console.log("ini user", user);
   let builder = new AbilityBuilder();
   if (user && typeof policies[user.role] === "function") {
     policies[user.role](user, builder);

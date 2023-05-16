@@ -8,11 +8,15 @@ function decodeToken() {
     try {
       const token = getToken(req);
 
+      console.log(token);
+
       if (!token) {
         return next();
       }
 
       req.user = jwt.verify(token, config?.secretKey);
+
+      console.log("==>", req.user);
 
       let user = await User.findOne({ token: { $in: [token] } });
 
@@ -38,6 +42,7 @@ function decodeToken() {
 const policies_check = (action, subject) => {
   return function (req, res, next) {
     let policy = policyFor(req.user);
+    console.log(policy, req.user);
     if (!policy.can(action, subject)) {
       return res.status(400).json({
         error: 1,

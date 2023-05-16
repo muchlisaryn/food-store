@@ -3,6 +3,7 @@ const path = require("path");
 const cookieParser = require("cookie-parser");
 const logger = require("morgan");
 const cors = require("cors");
+const session = require("express-session");
 const app = express();
 const { decodeToken } = require("./middlewares");
 
@@ -16,6 +17,7 @@ const deliveryRoute = require("./app/v1/deliveryAddress/router");
 const cartRoute = require("./app/v1/cart/router");
 const orderRoute = require("./app/v1/order/router");
 const invoiceRoute = require("./app/v1/invoice/router");
+const passport = require("passport");
 
 const v1 = "/api/v1";
 
@@ -23,15 +25,14 @@ const v1 = "/api/v1";
 app.set("views", path.join(__dirname, "views"));
 app.set("view engine", "pug");
 
-app.use(cors());
-
+app.use(express.static(path.join(__dirname, "public")));
 app.use(express.static("public"));
+app.use(cookieParser());
+app.use(cors());
+app.use(decodeToken());
 app.use(logger("dev"));
 app.use(express.json());
 app.use(express.urlencoded({ extended: false }));
-app.use(cookieParser());
-app.use(express.static(path.join(__dirname, "public")));
-app.use(decodeToken());
 
 app.use(v1, productRoute);
 app.use(v1, categoryRoute);
