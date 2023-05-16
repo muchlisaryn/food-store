@@ -38,7 +38,7 @@ function decodeToken() {
 const policies_check = (action, subject) => {
   return function (req, res, next) {
     let policy = policyFor(req.user);
-    if (policy.can(action, subject)) {
+    if (!policy.can(action, subject)) {
       return res.status(400).json({
         error: 1,
         message: `You are not allowed to ${action} ${subject}`,
