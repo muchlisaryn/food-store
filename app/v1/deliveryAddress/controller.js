@@ -4,11 +4,25 @@ const { policyFor } = require("../../../utils");
 
 const createDeliveryAddress = async (req, res, next) => {
   try {
-    const payload = req.body;
+    const {
+      name,
+      no_telephone,
+      kelurahan,
+      kecamatan,
+      kabupaten,
+      provinsi,
+      detail,
+    } = req.body;
     const user = req.user;
 
     const result = await DeliveryAddress.create({
-      ...payload,
+      name,
+      no_telephone,
+      kelurahan,
+      kecamatan,
+      kabupaten,
+      provinsi,
+      detail,
       user: user?._id,
     });
     await result.save();

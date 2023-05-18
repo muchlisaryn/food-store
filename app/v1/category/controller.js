@@ -9,7 +9,6 @@ const createCategory = async (req, res, next) => {
       tag: name?.toLowerCase(),
     });
 
-    console.log(findProduct);
     if (findProduct) {
       return res.status(400).json({
         error: 1,

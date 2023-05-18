@@ -11,8 +11,6 @@ const createProduct = async (req, res, next) => {
     const categoryName = category?.toLowerCase();
     const findCategory = await Category.findOne({ tag: categoryName });
 
-    console.log(tags);
-
     if (discount > 100) {
       return res.status(400).json({
         message: `Discount max 100%`,
@@ -30,8 +28,6 @@ const createProduct = async (req, res, next) => {
     const tag = await Tag.find({
       name: { $in: tags },
     });
-
-    console.log(tag);
 
     if (req.file) {
       let temp_path = req.file.path;
@@ -169,7 +165,6 @@ const updateProduct = async (req, res, next) => {
 
           if (fs.existsSync(currentimage)) {
             fs.unlinkSync(currentimage);
-            console.log();
           }
 
           let product = await Product.findByIdAndUpdate(
@@ -265,8 +260,6 @@ const getProduct = async (req, res, next) => {
     } = req.query;
 
     let ceriteria = {};
-
-    console.log(limit);
 
     if (status) {
       ceriteria = { ...ceriteria, status: status };

@@ -1,7 +1,6 @@
 const { Ability, AbilityBuilder } = require("@casl/ability");
 
 const getToken = (req, res, next) => {
-  console.log(req.headers.authorization);
   let token = req.headers.authorization
     ? req.headers.authorization.replace("Bearer", " ")
     : null;
@@ -21,6 +20,7 @@ const policies = {
     can("create", "Cart", { user_id: user._id });
     can("read", "Cart", { user_id: user._id });
     can("update", "Cart", { user_id: user._id });
+    can("delete", "Cart", { user_id: user._id });
     can("view", "DeliveryAddress");
     can("create", "DeliveryAddress", { user_id: user._id });
     can("read", "DeliveryAddress", { user_id: user._id });
@@ -34,7 +34,6 @@ const policies = {
 };
 
 const policyFor = (user) => {
-  console.log("ini user", user);
   let builder = new AbilityBuilder();
   if (user && typeof policies[user.role] === "function") {
     policies[user.role](user, builder);
