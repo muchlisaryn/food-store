@@ -25,43 +25,60 @@ const insert = async (req, res, next) => {
 
 const update = async (req, res, next) => {
   try {
-    const { items } = req.body;
-    const productsId = await items.map((item) => item?.product?._id);
-    const product = await Product.find({ _id: { $in: productsId } });
+    const { qty } = req.body;
+    const { id } = req.params;
 
-    let cartItems = items.map((item) => {
-      let relatedProduct = product.find(
-        (product) => product?._id.toString() === item.product._id
-      );
+    const findCart = CartItem.findById({ _id: id });
 
-      return {
-        product: relatedProduct._id,
-        price: relatedProduct.price,
-        name: relatedProduct.name,
-        user: req.user._id,
-        qty: item.qty,
-      };
-    });
+    if (!findCart) {
+      return res.status(400).json({
+        message: `Cart dengan ${id} tidak ditemukan`,
+      });
+    }
 
-    await CartItem.deleteMany({ user: req.user._id });
-    await CartItem.bulkWrite(
-      cartItems.map((item) => {
-        return {
-          updateOne: {
-            filter: {
-              user: req.user._id,
-              product: item.product,
-            },
-            update: item,
-            upsert: true,
-          },
-        };
-      })
+    const result = await CartItem.findByIdAndUpdate(
+      { _id: id },
+      { qty },
+      {
+        new: true,
+        runValidators: true,
+      }
     );
-    return res.json(cartItems);
+
+    return res.status(200).json(result);
+    // const productsId = await items.map((item) => item?.product?._id);
+    // const product = await Product.find({ _id: { $in: productsId } });
+
+    // let cartItems = items.map((item) => {
+    //   let relatedProduct = product.find(
+    //     (product) => product?._id.toString() === item.product._id
+    //   );
+
+    //   return {
+    //     product: relatedProduct._id,
+    //     user: req.user._id,
+    //     qty: item.qty,
+    //   };
+    // });
+
+    // await CartItem.bulkWrite(
+    //   cartItems.map((item) => {
+    //     return {
+    //       updateOne: {
+    //         filter: {
+    //           user: req.user._id,
+    //           product: item.product,
+    //         },
+    //         update: item,
+    //         upsert: true,
+    //       },
+    //     };
+    //   })
+    // );
+    // return res.json(cartItems);
   } catch (error) {
     if (error && error.name == "ValidationError") {
-      return res.json({
+      return res.status(400).json({
         error: 1,
         message: error.message,
         fields: error.message,
