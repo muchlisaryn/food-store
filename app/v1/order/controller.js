@@ -26,7 +26,7 @@ const store = async (req, res, next) => {
         kelurahan: address?.kelurahan,
         detail: address?.detail,
       },
-      user: req?.user?.id,
+      user: req?.user?._id,
     });
     let orderItems = await OrderItem.insertMany(
       items.map((item) => ({
@@ -63,9 +63,9 @@ const index = async (req, res, next) => {
       .skip(parseInt(skip))
       .limit(parseInt(limit))
       .populate("order_items")
-      .sort("-createAt");
+      .sort("-createdAt");
     return res.json({
-      data: orders.map((order) => order.toJson({ virtuals: true })),
+      data: orders.map((order) => order.toJSON({ virtuals: true })),
       count,
     });
   } catch (error) {
