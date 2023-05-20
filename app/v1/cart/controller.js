@@ -43,39 +43,10 @@ const update = async (req, res, next) => {
         new: true,
         runValidators: true,
       }
-    );
+    ).populate("product");
 
+    console.log(result);
     return res.status(200).json(result);
-    // const productsId = await items.map((item) => item?.product?._id);
-    // const product = await Product.find({ _id: { $in: productsId } });
-
-    // let cartItems = items.map((item) => {
-    //   let relatedProduct = product.find(
-    //     (product) => product?._id.toString() === item.product._id
-    //   );
-
-    //   return {
-    //     product: relatedProduct._id,
-    //     user: req.user._id,
-    //     qty: item.qty,
-    //   };
-    // });
-
-    // await CartItem.bulkWrite(
-    //   cartItems.map((item) => {
-    //     return {
-    //       updateOne: {
-    //         filter: {
-    //           user: req.user._id,
-    //           product: item.product,
-    //         },
-    //         update: item,
-    //         upsert: true,
-    //       },
-    //     };
-    //   })
-    // );
-    // return res.json(cartItems);
   } catch (error) {
     if (error && error.name == "ValidationError") {
       return res.status(400).json({
