@@ -1,21 +1,23 @@
 const CartItem = require("../cart/cart-item/model");
 const DeliveryAddress = require("../deliveryAddress/model");
 const Order = require("../order/model");
-const { types, Types } = require("mongoose");
+const { Types } = require("mongoose");
 const OrderItem = require("../order/order-item/model");
 
 const store = async (req, res, next) => {
   try {
     let { delivery_fee, delivery_address } = req.body;
+
     let items = await CartItem.find({ user: req.user._id }).populate("product");
     if (!items) {
-      return res.json({
+      return res.status(400).json({
         error: 1,
         message: "you're not create order because you have not items in cart",
       });
     }
     let address = await DeliveryAddress.findById(delivery_address);
-    let order = new Order({
+
+    let order = await new Order({
       _id: new Types.ObjectId(),
       status: "waiting_payment",
       delivery_fee,
@@ -28,6 +30,7 @@ const store = async (req, res, next) => {
       },
       user: req?.user?._id,
     });
+
     let orderItems = await OrderItem.insertMany(
       items.map((item) => ({
         ...item,
@@ -38,8 +41,9 @@ const store = async (req, res, next) => {
         product: item?.product._id,
       }))
     );
+
     orderItems.forEach((item) => order.order_items.push(item));
-    order.save();
+    await order.save();
     await CartItem.deleteMany({ user: req.user._id });
     return res.json(order);
   } catch (error) {
@@ -50,7 +54,6 @@ const store = async (req, res, next) => {
         fields: error.message,
       });
     }
-
     next(error);
   }
 };
@@ -62,7 +65,7 @@ const index = async (req, res, next) => {
     let orders = await Order.find({ user: req.user._id })
       .skip(parseInt(skip))
       .limit(parseInt(limit))
-      .populate("order_items")
+      .populate("orderItem")
       .sort("-createdAt");
     return res.json({
       data: orders.map((order) => order.toJSON({ virtuals: true })),
