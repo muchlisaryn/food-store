@@ -63,12 +63,16 @@ const index = async (req, res, next) => {
     let { skip = 0, limit = 10 } = req.query;
     let count = await Order.find({ user: req.user._id }).countDocuments();
     let orders = await Order.find({ user: req.user._id })
+      .populate({
+        path: "order_items",
+        model: "OrderItem",
+      })
       .skip(parseInt(skip))
       .limit(parseInt(limit))
-      .populate("orderItem")
       .sort("-createdAt");
+
     return res.json({
-      data: orders.map((order) => order.toJSON({ virtuals: true })),
+      data: orders,
       count,
     });
   } catch (error) {
