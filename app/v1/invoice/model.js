@@ -14,6 +14,11 @@ const invoiceSchema = Schema(
     },
 
     delivery_address: {
+      name: { type: String, required: [true, "Name harus diisi"] },
+      no_telephone: {
+        type: Number,
+        required: [true, "no telephone harus diisi"],
+      },
       provinsi: { type: String, required: [true, "provinsi harus diisi"] },
       kabupaten: { type: String, required: [true, "kabupaten harus diisi"] },
       kecamatan: { type: String, required: [true, "kecamatan harus diisi"] },
@@ -28,8 +33,8 @@ const invoiceSchema = Schema(
 
     payment_status: {
       type: String,
-      enum: ["waiting_payment", "paid"],
-      default: "waiting_payment",
+      enum: ["Waiting Payment", "Paid"],
+      default: "Waiting Payment",
     },
 
     user: {
@@ -41,6 +46,7 @@ const invoiceSchema = Schema(
       type: Schema.Types.ObjectId,
       ref: "Order",
     },
+    order_items: [{ type: Schema.Types.ObjectId, ref: "OrderItem" }],
   },
   { timestamps: true }
 );

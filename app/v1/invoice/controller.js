@@ -6,7 +6,7 @@ const getInvoice = async (req, res, next) => {
   try {
     const { order_id } = req.params;
     let invoice = await Invoice.findOne({ order: order_id })
-      .populate("order")
+      .populate("order_items")
       .populate("user");
 
     let policy = policyFor(req.user);
@@ -30,7 +30,7 @@ const getInvoice = async (req, res, next) => {
     }
     return res.json(invoice);
   } catch (error) {
-    return res.json({
+    return res.status(400).json({
       error: 1,
       message: "Error when getting invoice",
     });
