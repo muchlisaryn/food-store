@@ -24,7 +24,7 @@ const cartItemSchema = Schema(
 );
 
 cartItemSchema.virtual("total").get(function () {
-  return this.product.price * this.qty;
+  return this.product?.price * this.qty;
 });
 
 module.exports = model("CartItem", cartItemSchema);

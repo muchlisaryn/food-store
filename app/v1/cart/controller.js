@@ -1,4 +1,3 @@
-const Product = require("../product/model");
 const CartItem = require("./cart-item/model");
 
 const insert = async (req, res, next) => {
