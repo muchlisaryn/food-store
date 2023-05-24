@@ -108,7 +108,7 @@ const getTag = async (req, res, next) => {
     let ceriteria = {};
 
     if (q.length > 0) {
-      ceriteria = { ...ceriteria, name: { $regex: `${q}`, $options: "i" } };
+      ceriteria = { ...ceriteria, tag: { $regex: `${q}`, $options: "i" } };
     }
 
     const count = await Tag.find(ceriteria).countDocuments();

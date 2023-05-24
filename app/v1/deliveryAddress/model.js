@@ -40,7 +40,7 @@ const deliveryAddressSchema = Schema(
     },
     user: {
       type: Schema.Types.ObjectId,
-      ref: "User",
+      ref: "user",
     },
   },
   { timestamps: true }

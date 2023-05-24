@@ -73,4 +73,4 @@ userSchema.plugin(AutoIncrement, {
   disable_hooks: true,
 });
 
-module.exports = model("User", userSchema);
+module.exports = model("user", userSchema);

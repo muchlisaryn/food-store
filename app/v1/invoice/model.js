@@ -39,7 +39,7 @@ const invoiceSchema = Schema(
 
     user: {
       type: Schema.Types.ObjectId,
-      ref: "User",
+      ref: "user",
     },
 
     order: {

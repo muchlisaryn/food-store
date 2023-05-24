@@ -44,7 +44,6 @@ const update = async (req, res, next) => {
       }
     ).populate("product");
 
-    console.log(result);
     return res.status(200).json(result);
   } catch (error) {
     if (error && error.name == "ValidationError") {
@@ -79,20 +78,12 @@ const deleteCart = async (req, res, next) => {
   try {
     const { id } = req.params;
 
-    const checkId = await CartItem.findById({ _id: id });
-
-    if (!checkId) {
-      return res.status(400).json({
-        message: `id Tag ${id} tidak ditemukan`,
-      });
-    }
-
     const result = await CartItem.findByIdAndDelete({ _id: id });
 
     return res.status(200).json(result);
   } catch (err) {
     if (err && err.name == "ValidationError") {
-      return res.json({
+      return res.status(400).json({
         error: 1,
         message: err.message,
         fields: err.message,
