@@ -4,11 +4,26 @@ const insert = async (req, res, next) => {
   try {
     const { items, qty } = req.body;
 
+    console.log(items);
+
+    const findProductInCart = await CartItem.find({
+      product: items._id,
+      user: req.user._id,
+    });
+
+    if (findProductInCart.length > 0) {
+      return res.status(400).json({
+        error: 1,
+        message: "Product ini sudah ada di keranjang anda",
+      });
+    }
+
     const result = await CartItem.create({
       qty,
       product: items?._id,
       user: req.user._id,
     });
+
     return res.status(202).json(result);
   } catch (error) {
     if (error && error.name == "ValidationError") {
