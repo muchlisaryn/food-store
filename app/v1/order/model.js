@@ -32,9 +32,12 @@ const orderSchema = Schema(
     user: {
       type: Schema.Types.ObjectId,
       ref: "user",
+      required: true,
     },
 
-    order_items: [{ type: Schema.Types.ObjectId, ref: "OrderItem" }],
+    order_items: [
+      { type: Schema.Types.ObjectId, ref: "OrderItem", required: true },
+    ],
   },
   { toJSON: { virtuals: true }, timestamps: true }
 );
@@ -55,11 +58,11 @@ orderSchema.post("save", async function () {
     (total, item) => (total += item.price * item.qty),
     0
   );
-  const invoice = new Invoice({
+  const invoice = await new Invoice({
     user: this.user,
     order: this._id,
     order_items: this.order_items,
-    sub_total: sub_total,
+    sub_total: parseInt(sub_total),
     delivery_fee: parseInt(this.delivery_fee),
     total: parseInt(sub_total + this.delivery_fee),
     delivery_address: this.delivery_address,
