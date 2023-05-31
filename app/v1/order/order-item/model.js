@@ -9,7 +9,6 @@ const orderItemSchema = Schema(
     },
     name: {
       type: String,
-      minLength: [5, "Panjang nama makanan minimal 50 karakter"],
       required: [true, "Nama must be filled"],
     },
     price: {

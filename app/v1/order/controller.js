@@ -69,6 +69,7 @@ const OrderInCart = async (req, res, next) => {
     return res.json(order);
   } catch (error) {
     if (error && error.name === "ValidationError") {
+      console.log(error.message)
       return res.status(400).json({
         error: 1,
         message: error.message,
